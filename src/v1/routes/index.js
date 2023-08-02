@@ -1,9 +1,6 @@
 const router = require("express").Router();
+const cardsRoute = require("./cards.route");
 
-const routes = [];
-
-routes.forEach((route) => {
-  router.use(route.path, route.route);
-});
+router.use("/cards", cardsRoute);
 
 module.exports = router;
