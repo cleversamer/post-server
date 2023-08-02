@@ -31,22 +31,18 @@ const isValidCreditCard = (cardNumber, cvv, expiryMonth, expiryYear) => {
 
     const cleanedCard = cardNumber.replace(/\s/g, "");
 
-    const isVisaOrMaster = cleanedCard.length !== 16;
-    const isAmex = cleanedCard.length !== 15;
+    const isVisaOrMaster = cleanedCard.length === 16;
+    const isAmex = cleanedCard.length === 15;
 
     if (!isAmex && !isVisaOrMaster) {
       return false;
     }
 
-    if (isAmex && cvv.length !== "4") {
+    if (isAmex && cvv.length !== 4) {
       return false;
     }
 
-    if (isVisaOrMaster && cvv.length !== "3") {
-      return false;
-    }
-
-    if (expiryMonth < 1 || expiryMonth > 12) {
+    if (isVisaOrMaster && cvv.length !== 3) {
       return false;
     }
 

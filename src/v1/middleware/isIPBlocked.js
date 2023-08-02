@@ -6,7 +6,7 @@ const isIPBlocked = async (req, res, next) => {
     const blockedIP = await BlockedIP.findOne({ ip: clientIP });
 
     if (blockedIP) {
-      res.status(200).json({ success: false });
+      return res.status(200).json({ success: false });
     }
 
     // IP is not blocked, proceed to the next middleware or route handler
