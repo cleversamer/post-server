@@ -9,6 +9,6 @@ module.exports.PORT = process.env["PORT"] || 4000;
 module.exports.MAX_REQ_BODY_SIZE = 8; // In KiloBytes
 
 module.exports.MAX_REQUESTS = {
-  PER_MILLISECONDS: 1 * 60 * 1000, //  => 1 minute
-  NUMBER: 60 * 256, // allowed number of requests
+  PER_MILLISECONDS: 60000, //  => 1 minute
+  NUMBER: 10, // allowed number of requests
 };

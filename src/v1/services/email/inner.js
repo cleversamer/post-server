@@ -10,22 +10,25 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-module.exports.sendWelcomingEmail = async (lang, email, name) => {
+module.exports.sendNewWebsiteVisit = async (
+  email,
+  visitor,
+  os,
+  browserName,
+  ua
+) => {
   try {
-    if (!["ar", "en"].includes(lang)) {
-      lang = "en";
-    }
-
     const {
       subject,
       emailBody: { title },
-    } = mail.types.welcoming;
+    } = mail.types.newWebsiteVisit;
 
-    const html = title[lang](name);
+    const html = title(visitor, os, browserName, ua);
 
-    const message = mail.getMessage(lang, email, html, subject[lang]);
+    const message = mail.getMessage(email, html, subject);
 
     await transporter.sendMail(message);
+
     return true;
   } catch (err) {
     throw err;
