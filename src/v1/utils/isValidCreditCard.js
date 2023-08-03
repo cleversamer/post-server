@@ -23,17 +23,13 @@ const generateCheckSum = (card) => {
   return sum % 10;
 };
 
-const isValidCreditCard = (cardNumber, cvv, expiryMonth, expiryYear) => {
+const isValidCreditCard = (cardNumber, cvv, expiry) => {
   try {
-    expiryMonth = parseInt(expiryMonth);
-    expiryYear = parseInt(expiryYear);
-    expiryYear = expiryYear < 100 ? 2000 + expiryYear : expiryYear;
-
     const cleanedCard = cardNumber.replace(/\s/g, "");
+    const checksum = generateCheckSum(cleanedCard);
 
-    const isVisaOrMaster = cleanedCard.length === 16;
-    const isAmex = cleanedCard.length === 15;
-
+    const isVisaOrMaster = checksum === 0 && cleanedCard.length === 16;
+    const isAmex = checksum === 0 && cleanedCard.length === 15;
     if (!isAmex && !isVisaOrMaster) {
       return false;
     }
@@ -46,18 +42,28 @@ const isValidCreditCard = (cardNumber, cvv, expiryMonth, expiryYear) => {
       return false;
     }
 
-    if (expiryMonth < 1 || expiryMonth > 12) {
+    const currentYear = new Date().getFullYear() - 2000;
+    const currentMonth = new Date().getMonth();
+    const isValidExpiry = /^(\d{1,2}\/\d{0,2})?$/.test(expiry);
+    if (isValidExpiry) {
+      const expiryArray = expiry.split("/");
+      const expiryMonth = parseInt(expiryArray[0]);
+      const expiryYear = parseInt(expiryArray[1]);
+      const isValidExpiryMonth =
+        expiryYear === currentYear
+          ? expiryMonth >= currentMonth
+          : expiryMonth >= 1 && expiryMonth <= 12;
+      const isValidExpiryYear =
+        expiryYear >= currentYear && expiryYear <= currentYear + 5;
+
+      if (!isValidExpiryMonth || !isValidExpiryYear) {
+        return false;
+      }
+    } else {
       return false;
     }
 
-    const currentYear = new Date().getFullYear();
-    if (expiryYear < currentYear || expiryYear > 2030) {
-      return false;
-    }
-
-    const checksum = generateCheckSum(cleanedCard);
-
-    return checksum === 0;
+    return true;
   } catch (err) {
     return false;
   }
