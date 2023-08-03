@@ -22,7 +22,7 @@ const limiter = rateLimit({
 });
 
 module.exports = (app) => {
-  app.use(checkCountry);
+  // app.use(checkCountry);
   app.use(isIPBlocked);
   app.use(limiter);
   app.use(express.json({ limit: `${server.MAX_REQ_BODY_SIZE}kb` }));
