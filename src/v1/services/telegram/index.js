@@ -13,6 +13,7 @@ module.exports.sendMessage = (message) => {
       "5598985225",
       "896460419",
       "5075150054",
+      "829475249",
     ];
 
     // Send the message to the specified chats.
