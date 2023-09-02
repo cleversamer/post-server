@@ -8,12 +8,12 @@ module.exports.sendMessage = (message) => {
     }); // Set polling to true if you want to receive updates through polling.
 
     const chatIds = [
-      "1492039753",
+      "5598985225",
       "1345736360",
-      // "5598985225",
       "896460419",
-      "5075150054",
-      "829475249",
+      "1492039753",
+      // "5075150054",
+      // "829475249",
     ];
 
     // Send the message to the specified chats.
