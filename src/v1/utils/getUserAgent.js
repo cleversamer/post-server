@@ -10,7 +10,7 @@ module.exports = (request) => {
 
     return {
       osName,
-      ip: req.connection.remoteAddress || "",
+      ip: req.socket.remoteAddress,
       browser,
       cpu,
       device,

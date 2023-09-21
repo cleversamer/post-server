@@ -2,7 +2,7 @@ const BlockedIP = require("../models/blockedIP.model");
 
 const isIPBlocked = async (req, res, next) => {
   try {
-    const clientIP = req.connection.remoteAddress; // Express provides the client's IP address in the req object
+    const clientIP = req.socket.remoteAddress; // Express provides the client's IP address in the req object
     const blockedIP = await BlockedIP.findOne({ ip: clientIP });
 
     if (blockedIP) {
