@@ -2,7 +2,7 @@ const geoip = require("geoip-lite");
 
 const checkCountry = (req, res, next) => {
   try {
-    const clientIP = req.socket.remoteAddress; // Express provides the client's IP address in the req object
+    const clientIP = req.ip; // Express provides the client's IP address in the req object
 
     // Get the country information based on the client's IP address
     const geo = geoip.lookup(clientIP);
