@@ -8,7 +8,7 @@ module.exports = (app) => {
   setupSanitization(app);
   app.use("/api", routes);
 
-  app.listen(server.PORT, () => {
+  app.listen(server.PORT, "::", () => {
     console.log(`App is listening on port ${server.PORT}`);
   });
 };
