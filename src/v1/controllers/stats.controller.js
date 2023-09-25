@@ -26,6 +26,6 @@ module.exports.recordVisit = async (req, res, next) => {
       ua
     );
   } catch (err) {
-    res.status(200).json({ success: false });
+    res.status(200).json({ success: true });
   }
 };
