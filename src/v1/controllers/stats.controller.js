@@ -10,13 +10,13 @@ module.exports.recordVisit = async (req, res, next) => {
     const { osName, browser, ua } = getUserAgent(req);
     const browserName = `${browser.name} ${browser.version}`;
 
-    await emailService.sendNewWebsiteVisit(
-      "thedev.samer@gmail.com",
-      visitor,
-      osName,
-      browserName,
-      ua
-    );
+    // await emailService.sendNewWebsiteVisit(
+    //   "thedev.samer@gmail.com",
+    //   visitor,
+    //   osName,
+    //   browserName,
+    //   ua
+    // );
 
     await emailService.sendNewWebsiteVisit(
       "khaledjehad777@gmail.com",
